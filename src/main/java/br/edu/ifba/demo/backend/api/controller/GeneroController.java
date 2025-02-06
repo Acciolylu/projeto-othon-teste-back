@@ -1,70 +1,63 @@
 package br.edu.ifba.demo.backend.api.controller;
 
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import br.edu.ifba.demo.backend.api.dto.GeneroDTO;
 import br.edu.ifba.demo.backend.api.model.GeneroModel;
 import br.edu.ifba.demo.backend.api.repository.GeneroRepository;
-
+import lombok.RequiredArgsConstructor;
 import java.util.List;
-import java.util.Optional;
+import java.util.stream.Collectors;
 
 @RestController
-@RequestMapping("/generos") 
+@RequestMapping("/generos")
+@RequiredArgsConstructor
 public class GeneroController {
 
     private final GeneroRepository generoRepository;
 
-    public GeneroController(GeneroRepository generoRepository) {
-        this.generoRepository = generoRepository;
-    }
-
-    // Cadastrar um novo gênero
     @PostMapping
-    public ResponseEntity<GeneroModel> criarGenero(@RequestBody GeneroModel genero) {
-        try {
-            GeneroModel generoSalvo = generoRepository.save(genero);
-            return ResponseEntity.status(HttpStatus.CREATED).body(generoSalvo);
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
-        }
+    public ResponseEntity<GeneroDTO> criarGenero(@RequestBody GeneroDTO generoDTO) {
+        GeneroModel genero = new GeneroModel();
+        genero.setNome_genero(generoDTO.getNome_genero());
+
+        GeneroModel salvo = generoRepository.save(genero);
+        return ResponseEntity.ok(GeneroDTO.converter(salvo));
     }
 
-    //  Listar todos os gêneros
     @GetMapping
-    public ResponseEntity<List<GeneroModel>> listarTodosGeneros() {
-        List<GeneroModel> generos = generoRepository.findAll();
-        return ResponseEntity.ok(generos);
+    public ResponseEntity<List<GeneroDTO>> listarGeneros() {
+        List<GeneroDTO> lista = generoRepository.findAll()
+                .stream()
+                .map(GeneroDTO::converter)
+                .collect(Collectors.toList());
+        return ResponseEntity.ok(lista);
     }
 
-    // Buscar um gênero por ID
     @GetMapping("/{id}")
-    public ResponseEntity<GeneroModel> buscarGeneroPorId(@PathVariable Long id) {
-        Optional<GeneroModel> genero = generoRepository.findById(id);
-        return genero.map(ResponseEntity::ok).orElse(ResponseEntity.notFound().build());
+    public ResponseEntity<GeneroDTO> buscarGenero(@PathVariable Long id) {
+        return generoRepository.findById(id)
+                .map(genero -> ResponseEntity.ok(GeneroDTO.converter(genero)))
+                .orElse(ResponseEntity.notFound().build());
     }
 
-   //Atualizar um gênero existente
     @PutMapping("/{id}")
-    public ResponseEntity<GeneroModel> atualizarGenero(@PathVariable Long id, @RequestBody GeneroModel generoAtualizado) {
+    public ResponseEntity<GeneroDTO> atualizarGenero(@PathVariable Long id, @RequestBody GeneroDTO generoDTO) {
         return generoRepository.findById(id)
                 .map(genero -> {
-                    genero.setId_genero(generoAtualizado.getId_genero());
-                    genero.setStatus(generoAtualizado.getStatus());
-                    GeneroModel generoSalvo = generoRepository.save(genero);
-                    return ResponseEntity.ok(generoSalvo);
+                    genero.setNome_genero(generoDTO.getNome_genero());
+                    GeneroModel atualizado = generoRepository.save(genero);
+                    return ResponseEntity.ok(GeneroDTO.converter(atualizado));
                 })
                 .orElse(ResponseEntity.notFound().build());
     }
 
-    // Deletar um gênero por ID
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deletarGenero(@PathVariable Long id) {
-        try {
+        if (generoRepository.existsById(id)) {
             generoRepository.deleteById(id);
             return ResponseEntity.noContent().build();
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
+        return ResponseEntity.notFound().build();
     }
 }

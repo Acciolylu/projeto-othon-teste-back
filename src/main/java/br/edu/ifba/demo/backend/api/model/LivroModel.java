@@ -8,43 +8,58 @@ import java.sql.Timestamp;
 @Entity
 @Table(name = "livro")
 public class LivroModel {
-
+    
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id_livro")
-    private Long id_livro;
-
-    @Column(name = "titulo", nullable = false)
+    private Long idLivro;
+    
+    @Column(nullable = false)
     private String titulo;
 
-    @Column(name = "autor", nullable = false)
+    @Column(nullable = false)
     private String autor;
 
-    @Column(name = "editora", nullable = true)
     private String editora;
 
-    @Column(name = "ano_publicacao", nullable = true)
-    private Integer ano_publicacao;
+    @Column(name = "ano_publicacao")
+    private Integer anoPublicacao;
 
     @ManyToOne
-    @JoinColumn(name = "genero_id_genero", nullable = true)
+    @JoinColumn(name = "genero_id_genero")
     private GeneroModel genero;
 
-    @Column(name = "isbn", nullable = true)
     private String isbn;
 
-    @Column(name = "num_paginas", nullable = true)
-    private Integer num_paginas;
+    @Column(name = "num_paginas")
+    private Integer numPaginas;
 
-    @Column(name = "sinopse", nullable = true)
     private String sinopse;
 
-    @Column(name = "idioma", nullable = true)
     private String idioma;
 
-    @Column(name = "data_cadastro", nullable = true)
-    private Timestamp data_cadastro;
+    @Column(name = "data_cadastro")
+    private Timestamp dataCadastro;
 
-    @Column(name = "preco", nullable = true)
     private Double preco;
+
+    public LivroModel() {
+    }
+
+    public LivroModel(Long idLivro, String titulo, String autor, String editora, Integer anoPublicacao,
+            GeneroModel genero, String isbn, Integer numPaginas, String sinopse, String idioma, Timestamp dataCadastro,
+            Double preco) {
+        this.idLivro = idLivro;
+        this.titulo = titulo;
+        this.autor = autor;
+        this.editora = editora;
+        this.anoPublicacao = anoPublicacao;
+        this.genero = genero;
+        this.isbn = isbn;
+        this.numPaginas = numPaginas;
+        this.sinopse = sinopse;
+        this.idioma = idioma;
+        this.dataCadastro = dataCadastro;
+        this.preco = preco;
+    }
 }
