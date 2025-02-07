@@ -20,6 +20,6 @@ public class GeneroModel {
     @Column(name = "status", nullable = false)
     private byte status;
 
-    @OneToMany(mappedBy = "genero")
-    private List<LivroModel> livros;
+    //@OneToMany(mappedBy = "genero")
+    //private List<LivroModel> livros;
 }

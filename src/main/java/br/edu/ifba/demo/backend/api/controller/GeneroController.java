@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @RestController
+@CrossOrigin(origins = "http://localhost:8080")
 @RequestMapping("/generos")
 @RequiredArgsConstructor
 public class GeneroController {
@@ -42,16 +43,19 @@ public class GeneroController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<GeneroDTO> atualizarGenero(@PathVariable Long id, @RequestBody GeneroDTO generoDTO) {
-        return generoRepository.findById(id)
-                .map(genero -> {
-                    genero.setNome_genero(generoDTO.getNome_genero());
-                    GeneroModel atualizado = generoRepository.save(genero);
-                    return ResponseEntity.ok(GeneroDTO.converter(atualizado));
-                })
-                .orElse(ResponseEntity.notFound().build());
-    }
-
+    public ResponseEntity<GeneroModel> atualizarGenero(
+        @PathVariable Long id,
+        @RequestBody GeneroModel generoAtualizado) {
+    return generoRepository.findById(id)
+            .map(genero -> {
+                genero.setNome_genero(generoAtualizado.getNome_genero());
+                genero.setStatus(generoAtualizado.getStatus());
+                GeneroModel generoSalvo = generoRepository.save(genero);
+                return ResponseEntity.ok(generoSalvo);
+            })
+            .orElseGet(() -> ResponseEntity.notFound().build());
+}
+  
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deletarGenero(@PathVariable Long id) {
         if (generoRepository.existsById(id)) {
@@ -60,4 +64,6 @@ public class GeneroController {
         }
         return ResponseEntity.notFound().build();
     }
+
+    
 }
