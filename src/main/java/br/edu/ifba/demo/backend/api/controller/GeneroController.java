@@ -65,5 +65,14 @@ public class GeneroController {
         return ResponseEntity.notFound().build();
     }
 
+    @GetMapping("/listall")
+    public ResponseEntity<List<GeneroDTO>> listAll() {
+        List<GeneroDTO> lista = generoRepository.findAll()
+                .stream()
+                .map(GeneroDTO::converter)
+                .collect(Collectors.toList());
+        return ResponseEntity.ok(lista);
+    }
+
     
 }
